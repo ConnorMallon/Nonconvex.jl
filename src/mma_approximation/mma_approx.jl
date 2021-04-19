@@ -38,12 +38,15 @@ end
 
 Constructs an MMA approximation of the function `f` around the point `x` using a move limit `σ` and `ρ`. See [this paper](https://epubs.siam.org/doi/abs/10.1137/S1052623499362822) for an explanation of the notation.
 """
-function MMAApprox(f::AbstractFunction, x::AbstractVector; kwargs...)
+function MMAApprox(f::AbstractFunction, x::AbstractVector, tape; kwargs...)
+
     if getdim(f) == 1
-        val, grad = value_gradient(f, x)
+        val, grad = value_gradient(f, x, tape)
+        @show typeof(grad),typeof(val)
         return MMAApprox(f, x, val, copy(grad'); kwargs...)
+        #return MMAApprox(f, x, val, grad; kwargs...)
     else
-        val, jac = value_jacobian(f, x)
+        val, jac = my_value_jacobian(f, x, tape)
         return MMAApprox(f, x, val, jac; kwargs...)
     end
 end
@@ -52,19 +55,24 @@ function MMAApprox(
     x::AbstractVector,
     f::Real,
     ∇f::AbstractVector;
-    σ = fill(10.0, length(x)),
+    σ::AbstractVector = fill(10.0, length(x)),
     ρ = 0.0,
 )
-    l = x .- σ
-    u = x .+ σ
+
+    T= eltype(x)
+
+    l::Vector{T} = x .- σ
+    u, = x .+ σ
     ρ = Ref(ρ)
 
     # All matrices are stored as Adjoint{<:Real, <:AbstractMatrix} for cache efficiency
     p = similar(x)
     q = similar(x)
 
-    r = Ref(zero(f))
-    out = Ref(zero(f))
+    r::T, = Ref(zero(f))
+    out::T = Ref(zero(f))
+    #@show eltype(r)
+    #@show typeof(Ref(f))
 
     approx = MMAApprox(parent, copy(x), Ref(f), copy(∇f), σ, l, u, ρ, p, q, r, out)
     updateapprox!(approx, x, f, ∇f)

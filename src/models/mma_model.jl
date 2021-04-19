@@ -33,8 +33,10 @@ function MMAApproxModel(
     parent::AbstractModel,
     x::AbstractVector;
     extended = false,
+    tape,
     kwargs...,
 )
+
     T = eltype(x)
     σ = map(1:length(x)) do j
         diff = getmax(parent, j) - getmin(parent, j)
@@ -47,7 +49,8 @@ function MMAApproxModel(
     obj_constr = getobjectiveconstraints(parent)
     approx_obj_constr = MMAApprox(
         obj_constr,
-        x;
+        x,
+        tape;
         σ = σ,
         ρ = ρ,
     )

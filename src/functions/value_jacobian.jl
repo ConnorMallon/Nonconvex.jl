@@ -5,6 +5,8 @@
 
 Returns the value and Jacobian of the function `f` at the point `x`. The automatic differentiation package, Zygote, is used by default. To define a custom adjoint rule for a function to be used in a constraint or objective, use [`ChainRulesCore.jl`](https://github.com/JuliaDiff/ChainRulesCore.jl). The Jacobian is returned as an instance of `Adjoint` for cache efficiency in the optimizer.
 """
+
+#=
 function value_jacobian(f::Function, x::AbstractVector)
     out, pullback = Zygote.pullback(f, x)
     if out isa Number
@@ -30,14 +32,21 @@ function value_jacobian(c::VectorOfFunctions, x::AbstractVector)
     end
     return vals, jact'
 end
+=#
+
+function value_jacobian(f::Function, x::AbstractVector, tape)
+    my_value_jacobian = tape
+    @show tape
+    my_value_jacobian(f::Function, x::AbstractVector)
+end
 
 """
     value_jacobian_transpose(f::Function, x::AbstractVector)
 
 Returns the value and transpose of the Jacobian of `f` at the point `x`. This calls [`value_jacobian`](@ref) and transposes the Jacobian.
 """
-function value_jacobian_transpose(f::Function, x::AbstractVector)
-    val, jac = value_jacobian(f, x)
+function value_jacobian_transpose(f::Function, x::AbstractVector, tape)
+    val, jac = value_jacobian(f, x, tape)
     return val, jac'
 end
 
@@ -46,6 +55,6 @@ end
 
 Returns the value and gradient of the scalar-valued function `f` at the point `x`. This is a convenience function for scalar-valued functions that simply calls [`value_jacobian_transpose`](@ref) on `f` and `x`.
 """
-function value_gradient(f::Function, x::AbstractVector)
-    return value_jacobian_transpose(f, x)
+function value_gradient(f::Function, x::AbstractVector, tape)
+    return value_jacobian_transpose(f, x, tape)
 end
