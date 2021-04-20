@@ -35,7 +35,13 @@ end
 =#
 
 function value_jacobian(f::Function, x::AbstractVector)
-    return val, jac = f(x)
+    #ys = map(f.fs) do f
+        @show f=f.fs[1]
+        val, jac = f.f(x,true)
+        @show val, jac 
+        val, jac 
+    #end
+    #@show ys
 end
 
 """
@@ -44,7 +50,12 @@ end
 Returns the value and transpose of the Jacobian of `f` at the point `x`. This calls [`value_jacobian`](@ref) and transposes the Jacobian.
 """
 function value_jacobian_transpose(f::Function, x::AbstractVector)
-    val, jac = f(x)
+    #@show f
+    #@show typeof(f)
+    #@show f(x).fs
+    #f.fs.f(x)
+    #@show f.fs(x)
+    val, jac = value_jacobian(f::Function, x::AbstractVector)
     return val, jac'
 end
 
@@ -56,3 +67,13 @@ Returns the value and gradient of the scalar-valued function `f` at the point `x
 function value_gradient(f::Function, x::AbstractVector)
     return value_jacobian_transpose(f, x)
 end
+
+function (f::VectorOfFunctions)(args...; kwargs...)
+    ys = map(f.fs) do f
+        @show f
+        @show f.f(args...; kwargs...)
+        f(args...; kwargs...)
+    end
+    return vcat(ys...)
+end
+

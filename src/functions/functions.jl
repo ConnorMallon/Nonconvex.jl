@@ -91,6 +91,8 @@ Calls the wrapped functions in `f` with arguments `args` and keyword arguments `
 """
 function (f::VectorOfFunctions)(args...; kwargs...)
     ys = map(f.fs) do f
+        @show f
+        @show f.f(args...; kwargs...)
         f(args...; kwargs...)
     end
     return vcat(ys...)
@@ -153,6 +155,9 @@ Objective(f, multiple::Number = 1.0) = Objective(f, Ref(multiple))
 Calls the wrapped function in `obj` with arguments `args` and keyword arguments `kwargs` returning the output multiplied by `obj.multiple[]`. The output of the wrapped function must be a number.
 """
 function (o::Objective)(args...; kwargs...)
+    @show args
+    @show kwargs
+    @show o.f(args...; kwargs...)
     out = o.f(args...; kwargs...) * o.multiple[]
     @assert out isa Number
     return out

@@ -24,6 +24,7 @@ function MMADualObj(model::MMAApproxModel{<:MMAApprox})
     xk = getxk(model.approx_objective_ineq_constraints)
     x = copy(xk)
     approxfg = copy(getfk(model.approx_objective_ineq_constraints))
+    @show approxfg
     return MMADualObj(model, x, approxfg)
 end
 function MMADualObj(model::MMAApproxModel{<:XMMAApprox})
