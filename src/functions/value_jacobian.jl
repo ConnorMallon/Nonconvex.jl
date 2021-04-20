@@ -36,7 +36,6 @@ end
 
 function value_jacobian(f::Function, x::AbstractVector, tape)
     my_value_jacobian = tape
-    @show tape
     my_value_jacobian(f::Function, x::AbstractVector)
 end
 

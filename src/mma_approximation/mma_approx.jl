@@ -61,16 +61,25 @@ function MMAApprox(
 
     T= eltype(x)
 
-    l::Vector{T} = x .- σ
-    u, = x .+ σ
+    l = x .- σ
+    u = x .+ σ
+    @show typeof(ρ)
+    @show typeof(0.0)
+
+    ρ = 0.0 
     ρ = Ref(ρ)
+
 
     # All matrices are stored as Adjoint{<:Real, <:AbstractMatrix} for cache efficiency
     p = similar(x)
     q = similar(x)
 
-    r::T, = Ref(zero(f))
-    out::T = Ref(zero(f))
+    @show typeof(f)
+    @show typeof(zero(f))
+    @show typeof(Ref(zero(f)))
+
+    r = Ref(zero(f))
+    out = Ref(zero(f))
     #@show eltype(r)
     #@show typeof(Ref(f))
 
