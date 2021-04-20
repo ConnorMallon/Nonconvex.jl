@@ -5,6 +5,8 @@
 
 Returns the value and Jacobian of the function `f` at the point `x`. The automatic differentiation package, Zygote, is used by default. To define a custom adjoint rule for a function to be used in a constraint or objective, use [`ChainRulesCore.jl`](https://github.com/JuliaDiff/ChainRulesCore.jl). The Jacobian is returned as an instance of `Adjoint` for cache efficiency in the optimizer.
 """
+
+#=
 function value_jacobian(f::Function, x::AbstractVector)
     out, pullback = Zygote.pullback(f, x)
     if out isa Number
@@ -30,6 +32,11 @@ function value_jacobian(c::VectorOfFunctions, x::AbstractVector)
     end
     return vals, jact'
 end
+=#
+
+function value_jacobian(f::Function, x::AbstractVector)
+    return val, jac = f(x)
+end
 
 """
     value_jacobian_transpose(f::Function, x::AbstractVector)
@@ -37,7 +44,7 @@ end
 Returns the value and transpose of the Jacobian of `f` at the point `x`. This calls [`value_jacobian`](@ref) and transposes the Jacobian.
 """
 function value_jacobian_transpose(f::Function, x::AbstractVector)
-    val, jac = value_jacobian(f, x)
+    val, jac = f(x)
     return val, jac'
 end
 
